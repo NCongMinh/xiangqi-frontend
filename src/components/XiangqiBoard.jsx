@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import styles from "../styles/ChineseChess.module.css";
+import LeftPanel from "./LeftPanel";
+import RightPanel from "./RightPanel";
 
 const BOARD_CONFIG = {
   SQUARE_SIZE: 64,
@@ -90,9 +92,8 @@ const XiangqiBoard = () => {
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [validMoves, setValidMoves] = useState([]);
   const bgRef = useRef(null);
-
-  const moveAudioRef = useRef(new Audio("/move.mp3"));
-  const captureAudioRef = useRef(new Audio("/capture.mp3"));
+  const moveAudioRef = useRef(new Audio("/assets/sfx/sfxMove.mp3"));
+  const captureAudioRef = useRef(new Audio("/assets/sfx/sfxMove.mp3"));
 
   const checkGameEnd = (pieces) => {
     const kings = pieces.filter(
@@ -105,14 +106,58 @@ const XiangqiBoard = () => {
     }
     return null;
   };
-
+  const createInitialPieces = () => {
+    return [
+      // Red pieces (side: 1)
+      [1, PIECE_TYPES.ROOK.RED, 0, 0],
+      [1, PIECE_TYPES.ROOK.RED, 0, 8],
+      [1, PIECE_TYPES.KNIGHT.RED, 0, 1],
+      [1, PIECE_TYPES.KNIGHT.RED, 0, 7],
+      [1, PIECE_TYPES.ELEPHANT.RED, 0, 2],
+      [1, PIECE_TYPES.ELEPHANT.RED, 0, 6],
+      [1, PIECE_TYPES.ADVISOR.RED, 0, 3],
+      [1, PIECE_TYPES.ADVISOR.RED, 0, 5],
+      [1, PIECE_TYPES.KING.RED, 0, 4],
+      [1, PIECE_TYPES.CANNON.RED, 2, 1],
+      [1, PIECE_TYPES.CANNON.RED, 2, 7],
+      [1, PIECE_TYPES.PAWN.RED, 3, 0],
+      [1, PIECE_TYPES.PAWN.RED, 3, 2],
+      [1, PIECE_TYPES.PAWN.RED, 3, 4],
+      [1, PIECE_TYPES.PAWN.RED, 3, 6],
+      [1, PIECE_TYPES.PAWN.RED, 3, 8],
+      // Black pieces (side: -1)
+      [-1, PIECE_TYPES.ROOK.BLACK, 9, 0],
+      [-1, PIECE_TYPES.ROOK.BLACK, 9, 8],
+      [-1, PIECE_TYPES.KNIGHT.BLACK, 9, 1],
+      [-1, PIECE_TYPES.KNIGHT.BLACK, 9, 7],
+      [-1, PIECE_TYPES.ELEPHANT.BLACK, 9, 2],
+      [-1, PIECE_TYPES.ELEPHANT.BLACK, 9, 6],
+      [-1, PIECE_TYPES.ADVISOR.BLACK, 9, 3],
+      [-1, PIECE_TYPES.ADVISOR.BLACK, 9, 5],
+      [-1, PIECE_TYPES.KING.BLACK, 9, 4],
+      [-1, PIECE_TYPES.CANNON.BLACK, 7, 1],
+      [-1, PIECE_TYPES.CANNON.BLACK, 7, 7],
+      [-1, PIECE_TYPES.PAWN.BLACK, 6, 0],
+      [-1, PIECE_TYPES.PAWN.BLACK, 6, 2],
+      [-1, PIECE_TYPES.PAWN.BLACK, 6, 4],
+      [-1, PIECE_TYPES.PAWN.BLACK, 6, 6],
+      [-1, PIECE_TYPES.PAWN.BLACK, 6, 8],
+    ].map(([side, name, y, x]) => ({
+      side,
+      name,
+      y,
+      x,
+      dead: false,
+    }));
+  };
   const resetGame = () => {
     setGameState({
       side: 1,
       winner: null,
       moveHistory: [],
-      pieces: INITIAL_PIECES,
+      pieces: createInitialPieces(),
     });
+    console.log(gameState.pieces);
     setSelectedPiece(null);
     setValidMoves([]);
   };
@@ -348,15 +393,16 @@ const XiangqiBoard = () => {
 
   return (
     <div className={styles["game-container"]}>
-      <div className={styles["left-panel"]}>
+      {/* <div className={styles["left-panel"]}>
         <div className={styles["player-area"]}>
           <div className={styles["player-info"]}>
             <div className={styles["current-turn"]}>
-              {gameState.side === 1 ? "Red turn" : "Black turn"}
+              {gameState.side === 1 ? "Red turn" : "Green turn"}
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+      <LeftPanel gameState={gameState} />
       <div className={styles["board-container"]}>
         <div className={styles["board-wrapper"]}>
           <div className={styles["chess-pieces"]}>
@@ -424,81 +470,12 @@ const XiangqiBoard = () => {
               />
             ))}
           </div>
-          {/* <div className={styles.board} ref={bgRef} onClick={handleClick}>
-            {Array(9)
-              .fill(null)
-              .map((_, x) => (
-                <div
-                  key={`v${x}`}
-                  className={styles.verticalLine}
-                  style={{
-                    left: `${x * squareSize + halfBorderSize}px`,
-                    height: x > 0 && x < 8 ? "100%" : "50%",
-                    top: x > 0 && x < 8 ? "0" : "25%",
-                  }}
-                />
-              ))}
-
-            {Array(10)
-              .fill(null)
-              .map((_, y) => (
-                <div
-                  key={`h${y}`}
-                  className={styles.horizontalLine}
-                  style={{
-                    top: `${y * squareSize + halfBorderSize}px`,
-                    width: "100%",
-                  }}
-                />
-              ))}
-
-            {validMoves.map(([x, y], index) => (
-              <div
-                key={`move${index}`}
-                className={styles.validMoveIndicator}
-                style={{
-                  left: `${x * squareSize + halfBorderSize}px`,
-                  top: `${y * squareSize + halfBorderSize}px`,
-                }}
-              />
-            ))}
-
-            <div
-              className={styles.palaceLine}
-              style={{
-                top: "0",
-                left: `${3 * squareSize + halfBorderSize}px`,
-                width: `${2 * squareSize}px`,
-                height: `${2 * squareSize}px`,
-              }}
-            />
-            <div
-              className={styles.palaceLine}
-              style={{
-                bottom: "0",
-                left: `${3 * squareSize + halfBorderSize}px`,
-                width: `${2 * squareSize}px`,
-                height: `${2 * squareSize}px`,
-              }}
-            />
-
-            {markers.map(([y, x], i) => (
-              <div
-                key={i}
-                className={styles.marker}
-                style={{
-                  top: en(y),
-                  left: en(x),
-                }}
-              />
-            ))}
-          </div> */}
         </div>
         <button onClick={resetGame} className={styles["reset-button"]}>
           Reset
         </button>
       </div>
-      <div className={styles["right-panel"]}>
+      {/* <div className={styles["right-panel"]}>
         <div className={styles["move-history"]}>
           <h3>Move History</h3>
           <div className={styles["moves-list"]}>
@@ -509,7 +486,8 @@ const XiangqiBoard = () => {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
+      <RightPanel gameState={gameState} />
       {gameState.winner && (
         <div className={styles["game-over"]}>
           <div className={styles["game-over-content"]}>
@@ -521,95 +499,6 @@ const XiangqiBoard = () => {
         </div>
       )}
     </div>
-    // <div className={styles.contWrap}>
-    //   <div className={styles.cont}>
-    //     <div className={styles.chs}>
-    //       {gameState.chsArr.map((chess, i) => (
-    //         <span
-    //           key={i}
-    //           className={`
-    //             ${styles.ch}
-    //             ${chess.side > 0 ? styles.red : styles.green}
-    //             ${selectedPiece === i ? styles.active : ""}
-    //           `}
-    //           style={{
-    //             top: en(chess.y) + "px",
-    //             left: en(chess.x) + "px",
-    //             display: chess.dead ? "none" : "block",
-    //           }}
-    //         >
-    //           {chess.name}
-    //         </span>
-    //       ))}
-    //     </div>
-    //     <div className={styles.bg} ref={bgRef} onClick={handleClick}>
-    //       {Array(9)
-    //         .fill(null)
-    //         .map((_, y) => (
-    //           <div
-    //             key={y}
-    //             className={`${styles.row} ${y === 4 ? styles.middle : ""}`}
-    //           >
-    //             {Array(8)
-    //               .fill(null)
-    //               .map((_, x) => (
-    //                 <div
-    //                   key={x}
-    //                   className={`
-    //                 ${styles.sq}
-    //                 ${
-    //                   (y === 1 && x === 4) || (y === 8 && x === 4)
-    //                     ? styles.cross
-    //                     : ""
-    //                 }
-    //                 ${
-    //                   validMoves.some(([mx, my]) => mx === x && my === y)
-    //                     ? styles.validMove
-    //                     : ""
-    //                 }
-    //               `}
-    //                 />
-    //               ))}
-    //           </div>
-    //         ))}
-    //       {markers.map(([y, x], i) => (
-    //         <div
-    //           key={i}
-    //           className={styles.mk}
-    //           style={{
-    //             top: y * squareSize + halfBorderSize + "px",
-    //             left: x * squareSize + halfBorderSize + "px",
-    //           }}
-    //         />
-    //       ))}
-    //     </div>
-    //   </div>
-    //   <div className={styles.controls}>
-    //     <button onClick={resetGame} className={styles.button}>
-    //       Reset Game
-    //     </button>
-
-    //     <div className={styles.moveHistory}>
-    //       <h3>Move History</h3>
-    //       {gameState.moveHistory.map((move, index) => (
-    //         <div key={index} className={styles.moveItem}>
-    //           {`${index + 1}. ${move}`}
-    //         </div>
-    //       ))}
-    //     </div>
-    //   </div>
-
-    //   {gameState.winner && (
-    //     <div className={styles.gameOver}>
-    //       <div className={styles.gameOverContent}>
-    //         <h2>{gameState.winner}</h2>
-    //         <button onClick={resetGame} className={styles.button}>
-    //           Play Again
-    //         </button>
-    //       </div>
-    //     </div>
-    //   )}
-    // </div>
   );
 };
 

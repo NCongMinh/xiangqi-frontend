@@ -1,0 +1,66 @@
+.leftPanel {
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.turnIndicator {
+  background-color: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1em;
+}
+
+.contentPanel {
+  height: 450px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.panelContent {
+  padding: 16px;
+}
+
+.panelContent h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.chatContainer {
+  background-color: white;
+  padding: 8px;
+  border-radius: 4px;
+  height: 200px;
+  overflow-y: auto;
+}
+
+.buttonContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.navButton {
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background-color: #e0e0e0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.navButton:hover {
+  background-color: #d0d0d0;
+}
+
+.navButton.active {
+  background-color: #2196f3;
+  color: white;
+}
